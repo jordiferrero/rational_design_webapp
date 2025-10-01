@@ -337,6 +337,20 @@ export function HierarchicalContactAnglePopup() {
                 </ul>
               </div>
               
+              <div className="bg-white p-4 rounded border">
+                <h5 className="font-semibold text-gray-800 mb-3">Meniscus Position on Hierarchical Textures</h5>
+                <div className="text-center">
+                  <img 
+                    src="/images/diagram1.jpeg" 
+                    alt="Meniscus position on hierarchical textures"
+                    className="max-w-full h-auto rounded border"
+                  />
+                  <p className="text-sm text-gray-600 mt-2">
+                    Schematic of a low surface tension liquid on fibers decorated with particles with the liquid meniscus sitting at <strong>a,</strong> the fibers (θ=θ<sub>Y</sub>) and <strong>b,</strong> the particles θ = θ*<sub>particle</sub>.
+                  </p>
+                </div>
+              </div>
+              
               <div className="bg-pink-50 p-3 rounded border-l-4 border-pink-500">
                 <p className="text-sm text-pink-700">
                   <strong>Design Impact:</strong> This equation represents the pinnacle of liquid-repellent surface design, 
@@ -431,6 +445,120 @@ export function MaxFiberPorosityPopup() {
                   surfaces by determining the maximum fiber porosity that can maintain the desired stability 
                   for a given particle coating. It's crucial for optimizing the balance between high porosity 
                   (better repellency) and stability (durability).
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function Fabric2DContactAnglePopup() {
+  const [isOpen, setIsOpen] = useState(false)
+
+  if (!isOpen) {
+    return (
+      <button
+        onClick={() => setIsOpen(true)}
+        className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
+      >
+        <Info className="h-4 w-4 mr-1" />
+        Equation 7 (2D Fabric)
+      </button>
+    )
+  }
+
+  return (
+    <div>
+      <button
+        onClick={() => setIsOpen(true)}
+        className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
+      >
+        <Info className="h-4 w-4 mr-1" />
+        Equation 7 (2D Fabric)
+      </button>
+
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">Equation 7: 2D Fabric Contact Angle</h3>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+              <h4 className="font-semibold text-purple-800 mb-2">Two-Dimensional Fabric Model</h4>
+              <p className="text-sm text-purple-700">
+                Equation 7 provides a two-dimensional definition of fabric porosity that accounts for the actual 
+                weave structure. This is more accurate for plain weave fabrics where yarns intersect and create 
+                a true 2D geometry, compared to the one-dimensional approximation of Equation 1.
+              </p>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="bg-gray-50 p-4 rounded border-l-4 border-purple-500">
+                <MathEquation equation={EQUATIONS.fabric2DContactAngle} display={true} />
+              </div>
+              
+              <div className="bg-white p-4 rounded border">
+                <h5 className="font-semibold text-gray-800 mb-3">Geometric Schematics of Fibers</h5>
+                <div className="text-center">
+                  <img 
+                    src="/images/diagram2.jpeg" 
+                    alt="Geometric schematics of fibers"
+                    className="max-w-full h-auto rounded border"
+                  />
+                  <p className="text-sm text-gray-600 mt-2">
+                    <strong>a,</strong> A schematic of the woven mesh in plain weave. <strong>b,</strong> SEM image of the nylon jacket fabric (D*≈ 1.5) indicating a unit cell of yarns and open area.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <h5 className="font-semibold text-gray-800">Parameters:</h5>
+                <ul className="text-sm text-gray-700 space-y-1">
+                  <li>• <strong>θ*<sub>fabric</sub>:</strong> 2D fabric contact angle</li>
+                  <li>• <strong>θ<sub>Y</sub>:</strong> Young's contact angle (from surface chemistry)</li>
+                  <li>• <strong>D*<sub>fiber</sub>:</strong> Fiber porosity parameter</li>
+                  <li>• <strong>2D geometry:</strong> Accounts for yarn intersections in weave</li>
+                </ul>
+              </div>
+              
+              <div className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
+                <h5 className="font-semibold text-blue-800 mb-2">Key Differences from Equation 1:</h5>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  <li>• <strong>Equation 1:</strong> One-dimensional approximation for simple fiber arrays</li>
+                  <li>• <strong>Equation 7:</strong> Two-dimensional model for actual woven fabrics</li>
+                  <li>• <strong>Weave structure:</strong> Accounts for yarn intersections and overlaps</li>
+                  <li>• <strong>More accurate:</strong> Better prediction for plain weave fabrics</li>
+                </ul>
+              </div>
+              
+              <div className="bg-green-50 p-3 rounded border-l-4 border-green-500">
+                <h5 className="font-semibold text-green-800 mb-2">Physical Interpretation:</h5>
+                <p className="text-sm text-green-700 mb-2">
+                  This equation assumes every yarn of the weave adopts θ<sub>Y</sub> (magenta line in Figure 6). 
+                  If one instead assumes half the yarns remain dry, the two-dimensional definition reduces to Equation 1.
+                </p>
+                <p className="text-sm text-green-700">
+                  Data from Figure 6 indicated that this was true above a surface tension of γ<sub>LV</sub> ~ 31 mN/m. 
+                  Below this, an equally weighted average of equations (1) and (7) nicely fits the data (dashed line, Figure 6), 
+                  indicating that both wetted and non-wetted yarns were present along the contact line.
+                </p>
+              </div>
+              
+              <div className="bg-orange-50 p-3 rounded border-l-4 border-orange-500">
+                <p className="text-sm text-orange-700">
+                  <strong>Design Impact:</strong> Equation 7 is essential for accurately predicting contact angles on 
+                  woven fabrics, especially plain weaves. The ability to mix Equations 1 and 7 allows for fine-tuning 
+                  the model based on the specific fabric structure and wetting behavior observed experimentally.
                 </p>
               </div>
             </div>

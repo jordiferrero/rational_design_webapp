@@ -22,6 +22,9 @@ export interface FabricParameters {
   stabilityValue: number; // A* value
   useHierarchical: boolean; // whether to use particle coating
   usePerformanceTargets: boolean; // whether to use performance targets
+  // Equation mixing for 2D fabric model (only when no particle coating)
+  equation7Weight: number; // 0-1, weight of Equation 7 vs Equation 1 (0 = pure Eq 1, 1 = pure Eq 7)
+  percentOA?: number; // percent open area for %OA input mode
 }
 
 export const LIQUID_PROPERTIES: Record<string, LiquidProperties> = {
@@ -94,6 +97,22 @@ export function getContactAngleForLiquid(liquid: string, surfaceChemistry: strin
 }
 
 export const FABRIC_PRESETS = {
+  // Low D* fabrics (1-5 range)
+  nylonJacket: { 
+    name: 'Nylon Jacket Fabric', 
+    DFiberStar: 1.5, 
+    description: 'Low porosity fabric, 30% open area' 
+  },
+  sateenRegular: { 
+    name: 'Sateen Regular', 
+    DFiberStar: 2.8, 
+    description: 'Low porosity, 42% open area' 
+  },
+  sateenIrregular: { 
+    name: 'Sateen Irregular', 
+    DFiberStar: 3.2, 
+    description: 'Low-medium porosity, 47% open area' 
+  },
   plainWeave: { 
     name: 'Plain/Tabby Weave', 
     DFiberStar: 3.4, 
@@ -104,21 +123,62 @@ export const FABRIC_PRESETS = {
     DFiberStar: 3.4, 
     description: 'Diagonal pattern, 50% open area' 
   },
+  warpRibRegular: { 
+    name: 'Warp Rib Weave Regular', 
+    DFiberStar: 3.5, 
+    description: 'Ribbed pattern, 51% open area' 
+  },
   herringboneTwill: { 
     name: 'Herringbone Twill', 
     DFiberStar: 3.7, 
     description: 'V-shaped pattern, 53% open area' 
   },
-  satinRegular: { 
-    name: 'Satin Regular', 
-    DFiberStar: 8.1, 
-    description: 'High porosity, 77% open area' 
+  warpRibIrregular: { 
+    name: 'Warp Rib Weave Irregular', 
+    DFiberStar: 3.9, 
+    description: 'Irregular ribbed, 55% open area' 
   },
-  satinIrregular: { 
-    name: 'Satin Irregular', 
-    DFiberStar: 6.9, 
-    description: 'Medium-high porosity, 73% open area' 
+  mattRibIrregular: { 
+    name: 'Matt Rib Weave Irregular', 
+    DFiberStar: 4.0, 
+    description: 'Irregular basket weave, 57% open area' 
   },
+  honeycomb: { 
+    name: 'Ordinary Honeycomb', 
+    DFiberStar: 4.0, 
+    description: 'Honeycomb pattern, 56% open area' 
+  },
+  satinSateenChecks: { 
+    name: 'Satin-Sateen Checks', 
+    DFiberStar: 4.2, 
+    description: 'Checkered pattern, 58% open area' 
+  },
+  huckaback: { 
+    name: 'Huck-a-back Weave', 
+    DFiberStar: 4.3, 
+    description: 'Traditional pattern, 59% open area' 
+  },
+  weftRibRegular: { 
+    name: 'Weft Rib Weave Regular', 
+    DFiberStar: 4.4, 
+    description: 'Weft ribbed, 59% open area' 
+  },
+  weftRibIrregular: { 
+    name: 'Weft Rib Weave Irregular', 
+    DFiberStar: 4.5, 
+    description: 'Irregular weft ribbed, 60% open area' 
+  },
+  pointedTwill: { 
+    name: 'Pointed Twill', 
+    DFiberStar: 4.8, 
+    description: 'Pointed diagonal, 63% open area' 
+  },
+  mattWeave: { 
+    name: 'Matt Weave Regular', 
+    DFiberStar: 5.3, 
+    description: 'Basket weave, 66% open area' 
+  },
+  // High D* fabrics (5+ range)
   warpFacedTwill: { 
     name: 'Warp-faced Twill', 
     DFiberStar: 6.0, 
@@ -129,20 +189,15 @@ export const FABRIC_PRESETS = {
     DFiberStar: 6.8, 
     description: 'Weft-dominant, 73% open area' 
   },
-  honeycomb: { 
-    name: 'Ordinary Honeycomb', 
-    DFiberStar: 4.0, 
-    description: 'Honeycomb pattern, 56% open area' 
+  satinIrregular: { 
+    name: 'Satin Irregular', 
+    DFiberStar: 6.9, 
+    description: 'Medium-high porosity, 73% open area' 
   },
-  huckaback: { 
-    name: 'Huck-a-back Weave', 
-    DFiberStar: 4.3, 
-    description: 'Traditional pattern, 59% open area' 
-  },
-  mattWeave: { 
-    name: 'Matt Weave Regular', 
-    DFiberStar: 5.3, 
-    description: 'Basket weave, 66% open area' 
+  satinRegular: { 
+    name: 'Satin Regular', 
+    DFiberStar: 8.1, 
+    description: 'High porosity, 77% open area' 
   },
 };
 
@@ -306,7 +361,17 @@ export function calculateFabricDesign(
   // Calculate 1D and 2D fiber models
   const thetaFiber1D = thetaFiberStar(thetaY, DFiberStar);
   const thetaFabric2D = thetaFabric2DStar(thetaY, DFiberStar);
-  const thetaConvolved = (thetaFiber1D + thetaFabric2D) / 2;
+  
+  // Use equation mixing if no particle coating is applied
+  let thetaConvolved: number;
+  if (!params.useHierarchical) {
+    // Mix Equation 1 and Equation 7 based on equation7Weight
+    const weight = params.equation7Weight ?? 0.5; // Default to 50/50 mix
+    thetaConvolved = (1 - weight) * thetaFiber1D + weight * thetaFabric2D;
+  } else {
+    // When hierarchical coating is used, use the standard average
+    thetaConvolved = (thetaFiber1D + thetaFabric2D) / 2;
+  }
   
   // Calculate hierarchical model if enabled
   let thetaHierarchical: number | null = null;
@@ -411,6 +476,12 @@ export function calculateFabricDesign(
   
   // Determine which equations are being used
   const equationsUsed: string[] = ['Equation 1 (Fiber Contact Angle)'];
+  
+  // Add Equation 7 if not using hierarchical coating
+  if (!params.useHierarchical) {
+    equationsUsed.push('Equation 7 (2D Fabric Contact Angle)');
+  }
+  
   if (params.useHierarchical) {
     equationsUsed.push('Equation 2 (Particle Contact Angle)', 'Equation 3 (Hierarchical Contact Angle)', 'Equation 6 (Maximum Fiber Porosity)');
   }
@@ -504,4 +575,20 @@ export function calculateDParticleFromTheta(
   }
   
   return numerator / denominator;
+}
+
+// Calculate D*_fiber from percent open area (%OA)
+export function calculateDFiberFromPercentOA(percentOA: number): number {
+  // D* = 1/(1 - sqrt(%OA))
+  // %OA is expressed as a decimal (e.g., 0.5 for 50%)
+  const percentOADecimal = percentOA / 100;
+  return 1 / (1 - Math.sqrt(percentOADecimal));
+}
+
+// Calculate %OA from D*_fiber
+export function calculatePercentOAFromDFiber(DFiberStar: number): number {
+  // %OA = (1 - 1/D*)^2
+  // Returns as percentage (e.g., 50 for 50%)
+  const percentOADecimal = Math.pow(1 - 1/DFiberStar, 2);
+  return percentOADecimal * 100;
 }

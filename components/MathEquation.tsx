@@ -43,5 +43,11 @@ export const EQUATIONS = {
   
   fiberRobustness: 'A^*_{\\text{fiber}} = \\frac{\\ell_{\\text{cap}}}{R_{\\text{fiber}}(D^*_{\\text{fiber}} - 1)} \\frac{1 - \\cos\\theta_Y}{D^*_{\\text{fiber}} - 1 + 2\\sin\\theta_Y}',
   
-  hierarchicalRobustness: 'A^*_{\\text{hierarchical}} = \\frac{\\ell_{\\text{cap}}}{R_{\\text{fiber}}(D^*_{\\text{fiber}} - 1)} \\frac{1 - \\cos\\theta^*_{\\text{particle}}}{D^*_{\\text{fiber}} - 1 + 2\\sin\\theta^*_{\\text{particle}}}'
+  hierarchicalRobustness: 'A^*_{\\text{hierarchical}} = \\frac{\\ell_{\\text{cap}}}{R_{\\text{fiber}}(D^*_{\\text{fiber}} - 1)} \\frac{1 - \\cos\\theta^*_{\\text{particle}}}{D^*_{\\text{fiber}} - 1 + 2\\sin\\theta^*_{\\text{particle}}}',
+  
+  // Equation 7: 2D Fabric Contact Angle
+  fabric2DContactAngle: '\\cos\\theta^*_{\\text{fabric}} = -1 + \\frac{2D^*_{\\text{fiber}} - 1}{(D^*_{\\text{fiber}})^2} [(\\pi - \\theta_Y) \\cos\\theta_Y + \\sin\\theta_Y]',
+  
+  // %OA to D* conversion
+  percentOpenAreaToDStar: 'D^* = \\frac{1}{1 - \\sqrt{\\%OA}}'
 }

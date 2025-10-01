@@ -91,6 +91,17 @@ export function DFiberDiagram() {
                   influences the apparent contact angle and liquid repellency.
                 </p>
               </div>
+              <div className="bg-gray-50 p-4 rounded border-l-4 border-blue-500">
+                <h5 className="font-semibold text-gray-800 mb-2">Alternative Calculation from %OA</h5>
+                <p className="text-sm text-gray-700 mb-3">
+                  Typically, woven metal meshes are characterized by the percent open area (%OA) of the mesh. 
+                  D*<sub>fiber</sub> can also be calculated by converting %OA to D* by:
+                </p>
+                <MathEquation equation={EQUATIONS.percentOpenAreaToDStar} display={true} />
+                <p className="text-xs text-gray-600 mt-2">
+                  This provides an alternative way to determine D*<sub>fiber</sub> when you know the percent open area of your fabric.
+                </p>
+              </div>
             </div>
           </div>
         </div>

@@ -11,7 +11,8 @@ import {
   ParticleContactAnglePopup, 
   HierarchicalContactAnglePopup, 
   MaxFiberPorosityPopup,
-  RobustnessParameterPopup 
+  RobustnessParameterPopup,
+  Fabric2DContactAnglePopup
 } from '@/components/EquationExplanations'
 import { 
   calculateFabricDesign, 
@@ -26,7 +27,9 @@ import {
   calculateDParticleFromTheta,
   thetaParticleStar,
   porositySphericalParticles,
-  thetaFiberStar
+  thetaFiberStar,
+  calculateDFiberFromPercentOA,
+  calculatePercentOAFromDFiber
 } from '@/lib/calculations'
 
 export default function DesignerPage() {
@@ -44,6 +47,7 @@ export default function DesignerPage() {
     stabilityValue: 5, // A* value
     useHierarchical: false, // whether to use particle coating
     usePerformanceTargets: false, // whether to use performance targets
+    equation7Weight: 0.5, // Default to 50/50 mix of Equation 1 and 7
   })
   
   const [selectedLiquid, setSelectedLiquid] = useState('hexadecane')
@@ -51,7 +55,7 @@ export default function DesignerPage() {
   const [selectedFabricPreset, setSelectedFabricPreset] = useState<string | null>('plainWeave')
   const [targetAStar, setTargetAStar] = useState(5) // Default A* value
   const [particleInputMode, setParticleInputMode] = useState<'size' | 'angle'>('angle') // 'size' for diameter/spacing, 'angle' for theta*_particle
-  const [fabricInputMode, setFabricInputMode] = useState<'preset' | 'size' | 'angle'>('preset') // 'preset' for dropdown, 'size' for diameter/spacing, 'angle' for theta*_fiber
+  const [fabricInputMode, setFabricInputMode] = useState<'preset' | 'size' | 'angle' | 'percentOA'>('preset') // 'preset' for dropdown, 'size' for diameter/spacing, 'angle' for theta*_fiber, 'percentOA' for %OA input
   const [calculatedDParticleStar, setCalculatedDParticleStar] = useState<number | null>(null) // D*_particle calculated from θ*_particle
   const [results, setResults] = useState<any>(null)
   const [errors, setErrors] = useState<string[]>([])
@@ -204,7 +208,20 @@ export default function DesignerPage() {
       const dFiberStar = calculateDFiberFromTheta(thetaFiberStarRad, thetaY)
       const spacing = calculateSpacingFromDFiber(dFiberStar, radius)
       updateParam('fiberSpacing', spacing)
+    } else if (fabricInputMode === 'percentOA') {
+      // In %OA mode, recalculate spacing from current %OA
+      const dFiberStar = calculateDFiberFromPercentOA(params.percentOA || 50)
+      const spacing = calculateSpacingFromDFiber(dFiberStar, radius)
+      updateParam('fiberSpacing', spacing)
     }
+  }
+
+  const updateFabricFromPercentOA = (percentOA: number) => {
+    updateParam('percentOA', percentOA)
+    const radius = params.fiberDiameter / 2
+    const dFiberStar = calculateDFiberFromPercentOA(percentOA)
+    const spacing = calculateSpacingFromDFiber(dFiberStar, radius)
+    updateParam('fiberSpacing', spacing)
   }
 
   const getStabilityColor = (isStable: boolean) => {
@@ -317,14 +334,14 @@ export default function DesignerPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Input Method
                   </label>
-                  <div className="flex space-x-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <label className="flex items-center">
                       <input
                         type="radio"
                         name="fabricInputMode"
                         value="preset"
                         checked={fabricInputMode === 'preset'}
-                        onChange={(e) => setFabricInputMode(e.target.value as 'preset' | 'size' | 'angle')}
+                        onChange={(e) => setFabricInputMode(e.target.value as 'preset' | 'size' | 'angle' | 'percentOA')}
                         className="mr-2"
                       />
                       Preset Weaves
@@ -335,7 +352,7 @@ export default function DesignerPage() {
                         name="fabricInputMode"
                         value="size"
                         checked={fabricInputMode === 'size'}
-                        onChange={(e) => setFabricInputMode(e.target.value as 'preset' | 'size' | 'angle')}
+                        onChange={(e) => setFabricInputMode(e.target.value as 'preset' | 'size' | 'angle' | 'percentOA')}
                         className="mr-2"
                       />
                       Size & Spacing
@@ -346,10 +363,21 @@ export default function DesignerPage() {
                         name="fabricInputMode"
                         value="angle"
                         checked={fabricInputMode === 'angle'}
-                        onChange={(e) => setFabricInputMode(e.target.value as 'preset' | 'size' | 'angle')}
+                        onChange={(e) => setFabricInputMode(e.target.value as 'preset' | 'size' | 'angle' | 'percentOA')}
                         className="mr-2"
                       />
                       Size & θ*<sub>fiber</sub>
+                    </label>
+                    <label className="flex items-center">
+                      <input
+                        type="radio"
+                        name="fabricInputMode"
+                        value="percentOA"
+                        checked={fabricInputMode === 'percentOA'}
+                        onChange={(e) => setFabricInputMode(e.target.value as 'preset' | 'size' | 'angle' | 'percentOA')}
+                        className="mr-2"
+                      />
+                      % Open Area
                     </label>
                   </div>
                 </div>
@@ -451,6 +479,97 @@ export default function DesignerPage() {
                   </div>
                 )}
 
+                {fabricInputMode === 'percentOA' && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Fiber Diameter (μm)
+                        <span className="text-xs text-gray-500 block">Normal range: 10-200 μm</span>
+                      </label>
+                      <input
+                        type="number"
+                        value={params.fiberDiameter}
+                        onChange={(e) => updateFabricFromDiameter(safeParseFloat(e.target.value, params.fiberDiameter))}
+                        className="input"
+                        min="1"
+                        max="2000"
+                        step="1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        % Open Area
+                        <span className="text-xs text-gray-500 block">Percentage of open area (0-100%)</span>
+                      </label>
+                      <input
+                        type="number"
+                        value={params.percentOA || 50}
+                        onChange={(e) => updateFabricFromPercentOA(safeParseFloat(e.target.value, 50))}
+                        className="input"
+                        min="0"
+                        max="100"
+                        step="1"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Equation Mixing (only when no particle coating) */}
+                {!params.useHierarchical && (
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold mb-4">Equation Mixing (2D Fabric Model)</h3>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Equation 1 vs Equation 7 Weight
+                          <span className="text-xs text-gray-500 block">
+                            Mix between 1D approximation (Equation 1) and 2D fabric model (Equation 7)
+                          </span>
+                        </label>
+                        
+                        <div className="space-y-2">
+                          <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.1"
+                            value={params.equation7Weight}
+                            onChange={(e) => updateParam('equation7Weight', parseFloat(e.target.value))}
+                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                            style={{
+                              background: `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${params.equation7Weight * 100}%, #E5E7EB ${params.equation7Weight * 100}%, #E5E7EB 100%)`
+                            }}
+                          />
+                          
+                          <div className="flex justify-between text-xs text-gray-500">
+                            <span>Pure Equation 1 (1D)</span>
+                            <span>Pure Equation 7 (2D)</span>
+                          </div>
+                          
+                          <div className="text-center">
+                            <span className="text-sm font-medium text-gray-700">
+                              Current mix: {Math.round((1 - params.equation7Weight) * 100)}% Equation 1, {Math.round(params.equation7Weight * 100)}% Equation 7
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-3 p-3 bg-blue-50 rounded border-l-4 border-blue-500">
+                          <p className="text-sm text-blue-800">
+                            <strong>Equation 7:</strong> Two-dimensional definition of fabric porosity that accounts for 
+                            the actual weave structure. This is more accurate for plain weave fabrics where 
+                            yarns intersect and create a true 2D geometry.
+                          </p>
+                          <p className="text-xs text-blue-600 mt-1">
+                            Use more Equation 7 for plain weaves, more Equation 1 for simple fiber arrays.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Show calculated values */}
                 {fabricInputMode !== 'preset' && (
                   <div className="mt-4 p-3 bg-blue-50 rounded border-l-4 border-blue-500">
@@ -462,12 +581,22 @@ export default function DesignerPage() {
                         </span>
                       </div>
                       <div>
-                        <span className="text-blue-700 font-medium">Spacing:</span>
+                        <span className="text-blue-700 font-medium">
+                          {fabricInputMode === 'percentOA' ? '% Open Area:' : 'Spacing:'}
+                        </span>
                         <span className="ml-2 text-blue-900">
-                          {params.fiberSpacing.toFixed(1)} μm
+                          {fabricInputMode === 'percentOA' 
+                            ? `${params.percentOA?.toFixed(1) || 50}%`
+                            : `${params.fiberSpacing.toFixed(1)} μm`
+                          }
                         </span>
                       </div>
                     </div>
+                    {fabricInputMode === 'percentOA' && (
+                      <div className="mt-2 text-xs text-blue-600">
+                        Spacing: {params.fiberSpacing.toFixed(1)} μm
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -842,6 +971,7 @@ export default function DesignerPage() {
                         if (eqName.includes("Hierarchical Contact Angle")) return <HierarchicalContactAnglePopup key={i} />
                         if (eqName.includes("Maximum Fiber Porosity")) return <MaxFiberPorosityPopup key={i} />
                         if (eqName.includes("Robustness Parameter")) return <RobustnessParameterPopup key={i} />
+                        if (eqName.includes("Equation 7")) return <Fabric2DContactAnglePopup key={i} />
                         return null
                       }
                       
