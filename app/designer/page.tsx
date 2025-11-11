@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Calculator, AlertCircle, CheckCircle, Info, Target, Settings, ToggleLeft, ToggleRight, BookOpen } from 'lucide-react'
 import { DFiberDiagram, DParticleDiagram } from '@/components/Diagrams'
+import { ContactAngleDiagram } from '@/components/ContactAngleDiagram'
+import { FiberPorosityDiagram } from '@/components/FiberPorosityDiagram'
 import { AStarPopup } from '@/components/AStarPopup'
 import { 
   YoungsEquationPopup, 
@@ -794,7 +796,10 @@ export default function DesignerPage() {
                         {results.DFiberStar.toFixed(2)}
                       </div>
                       <div className="text-sm text-gray-600 mb-2">Fiber Porosity (D*<sub>fiber</sub>)</div>
-                      <DFiberDiagram />
+                      <FiberPorosityDiagram dStar={results.DFiberStar} size={180} />
+                      <div className="mt-2">
+                        <DFiberDiagram />
+                      </div>
                     </div>
                     
                     {params.useHierarchical && (
@@ -828,9 +833,14 @@ export default function DesignerPage() {
                           ? results.thetaHierarchical.toFixed(1)
                           : results.thetaConvolved.toFixed(1)}°
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-600 mb-3">
                         {params.useHierarchical ? 'Hierarchical Contact Angle' : 'Current Contact Angle'}
                       </div>
+                      <ContactAngleDiagram 
+                        contactAngle={params.useHierarchical && results.thetaHierarchical 
+                          ? results.thetaHierarchical 
+                          : results.thetaConvolved}
+                      />
                     </div>
                   </div>
 
