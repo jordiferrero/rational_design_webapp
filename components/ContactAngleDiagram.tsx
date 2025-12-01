@@ -159,7 +159,7 @@ export function ContactAngleDiagram({
           </filter>
         </defs>
 
-        {/* Surface shadow */}
+        {/* Surface shadow
         <rect
           x="0"
           y={surfaceY + surfaceHeight}
@@ -167,7 +167,7 @@ export function ContactAngleDiagram({
           height="4"
           fill="#000000"
           opacity="0.2"
-        />
+        /> */}
 
         {/* Surface (modern dark table with gradient) */}
         <rect

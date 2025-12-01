@@ -6,6 +6,7 @@ import { ArrowLeft, Calculator, AlertCircle, CheckCircle, Info, Target, Settings
 import { DFiberDiagram, DParticleDiagram } from '@/components/Diagrams'
 import { ContactAngleDiagram } from '@/components/ContactAngleDiagram'
 import { FiberPorosityDiagram } from '@/components/FiberPorosityDiagram'
+import { ParticlePorosityDiagram } from '@/components/ParticlePorosityDiagram'
 import { AStarPopup } from '@/components/AStarPopup'
 import { DiagramInfoPopup } from '@/components/DiagramInfoPopup'
 import { DesignerPlot } from '@/components/DesignerPlot'
@@ -815,7 +816,16 @@ export default function DesignerPage() {
                                 {results.currentDParticleStar?.toFixed(2) || 'N/A'}
                               </div>
                               <div className="text-sm text-gray-600 mb-2">Particle Porosity (D*<sub>particle</sub>)</div>
-                              <DParticleDiagram />
+                              {results.currentDParticleStar && (
+                                <ParticlePorosityDiagram 
+                                  dParticleStar={results.currentDParticleStar}
+                                  size={300}
+                                  height={80}
+                                />
+                              )}
+                              <div className="mt-2">
+                                <DParticleDiagram />
+                              </div>
                             </>
                           ) : (
                             <>
@@ -826,7 +836,16 @@ export default function DesignerPage() {
                               <div className="text-xs text-gray-500 mt-2">
                                 Calculated from θ*<sub>particle</sub> = {params.thetaParticleStar.toFixed(1)}°
                               </div>
-                              <DParticleDiagram />
+                              {calculatedDParticleStar && (
+                                <ParticlePorosityDiagram 
+                                  dParticleStar={calculatedDParticleStar}
+                                  size={300}
+                                  height={80}
+                                />
+                              )}
+                              <div className="mt-2">
+                                <DParticleDiagram />
+                              </div>
                             </>
                           )}
                         </div>
@@ -971,16 +990,16 @@ export default function DesignerPage() {
                 </div>
 
                 {/* Diagram Card */}
-                <div className="card">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold">Contact angle and Robustness Plot</h3>
-                    <DiagramInfoPopup 
-                      liquid={selectedLiquid} 
-                      surfaceChemistry={SURFACE_CHEMISTRIES[selectedSurfaceChemistry as keyof typeof SURFACE_CHEMISTRIES]?.name || 'PDMS'} 
-                    />
-                  </div>
-                  
-                  {!params.useHierarchical && results ? (
+                {!params.useHierarchical && results && (
+                  <div className="card">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold">Contact angle and Robustness Plot</h3>
+                      <DiagramInfoPopup 
+                        liquid={selectedLiquid} 
+                        surfaceChemistry={SURFACE_CHEMISTRIES[selectedSurfaceChemistry as keyof typeof SURFACE_CHEMISTRIES]?.name || 'PDMS'} 
+                      />
+                    </div>
+                    
                     <div className="w-full max-w-full overflow-hidden">
                       <DesignerPlot
                         liquid={selectedLiquid}
@@ -994,12 +1013,8 @@ export default function DesignerPage() {
                         height={400}
                       />
                     </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      <p>Plot coming soon</p>
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {/* Equations Used Footer */}
                 <div className="card bg-gray-50">
