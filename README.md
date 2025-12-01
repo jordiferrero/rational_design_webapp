@@ -62,6 +62,31 @@ npm run build
 npm start
 ```
 
+### Web Analytics Setup
+
+This webapp includes Google Analytics support for tracking page views and user interactions.
+
+1. **Create a Google Analytics 4 (GA4) property** at [Google Analytics](https://analytics.google.com/)
+
+2. **Get your Measurement ID** (format: `G-XXXXXXXXXX`)
+
+3. **Set the environment variable:**
+   - For local development: Create a `.env.local` file:
+     ```
+     NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+     ```
+   - For GitHub Pages: Add the environment variable in your GitHub repository settings:
+     - Go to Settings → Secrets and variables → Actions
+     - Add a new repository secret: `NEXT_PUBLIC_GA_MEASUREMENT_ID` with your GA4 Measurement ID
+     - Update your GitHub Actions workflow to use this secret
+
+4. **The analytics will automatically track:**
+   - Page views
+   - Route changes
+   - User interactions
+
+Note: Analytics only loads if `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set, so it's safe to deploy without it.
+
 ## 🏗️ Technical Architecture
 
 ### Framework
