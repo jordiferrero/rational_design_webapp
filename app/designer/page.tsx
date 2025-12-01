@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Calculator, AlertCircle, CheckCircle, Info, Target, Settings, ToggleLeft, ToggleRight, BookOpen, BarChart3} from 'lucide-react'
+import { ArrowLeft, Calculator, AlertCircle, CheckCircle, Info, Settings, ToggleLeft, ToggleRight, BookOpen, BarChart3} from 'lucide-react'
 import { DFiberDiagram, DParticleDiagram } from '@/components/Diagrams'
 import { ContactAngleDiagram } from '@/components/ContactAngleDiagram'
 import { FiberPorosityDiagram } from '@/components/FiberPorosityDiagram'

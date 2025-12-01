@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Droplets, Shield, Zap, Calculator, BookOpen } from 'lucide-react'
+import { Droplets } from 'lucide-react'
 
 export default function HomePage() {
   return (

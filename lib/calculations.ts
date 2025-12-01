@@ -211,21 +211,6 @@ export function radToDeg(radians: number): number {
   return (radians * 180) / Math.PI;
 }
 
-// Young's contact angle calculation
-export function youngsAngle(
-  surfaceTensionSV: number,
-  surfaceTensionSL: number,
-  surfaceTensionLV: number
-): number {
-  return Math.acos((surfaceTensionSV - surfaceTensionSL) / surfaceTensionLV);
-}
-
-// Wenzel angle calculation
-export function wenzelAngle(thetaY: number, curvatureR: number): number {
-  const cosValue = Math.max(-1, Math.min(1, curvatureR * Math.cos(thetaY)));
-  return Math.acos(cosValue);
-}
-
 // Porosity parameter for cylindrical fibers
 export function porosityCylindricalFibers(
   spacingBtwFibers: number,
