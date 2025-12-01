@@ -64,7 +64,9 @@ npm start
 
 ### Web Analytics Setup
 
-This webapp includes Google Analytics support for tracking page views and user interactions.
+This webapp includes both Google Analytics and PostHog for comprehensive analytics tracking.
+
+#### Google Analytics Setup
 
 1. **Create a Google Analytics 4 (GA4) property** at [Google Analytics](https://analytics.google.com/)
 
@@ -78,14 +80,39 @@ This webapp includes Google Analytics support for tracking page views and user i
    - For GitHub Pages: Add the environment variable in your GitHub repository settings:
      - Go to Settings → Secrets and variables → Actions
      - Add a new repository secret: `NEXT_PUBLIC_GA_MEASUREMENT_ID` with your GA4 Measurement ID
-     - Update your GitHub Actions workflow to use this secret
 
 4. **The analytics will automatically track:**
    - Page views
    - Route changes
    - User interactions
 
-Note: Analytics only loads if `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set, so it's safe to deploy without it.
+#### PostHog Setup
+
+1. **Create a PostHog account** at [PostHog](https://posthog.com/) (free tier available)
+
+2. **Get your Project API Key** from your PostHog project settings
+
+3. **Set the environment variables:**
+   - For local development: Add to your `.env.local` file:
+     ```
+     NEXT_PUBLIC_POSTHOG_KEY=your_posthog_api_key
+     NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+     ```
+     (Use `https://eu.i.posthog.com` if your PostHog instance is in the EU region)
+
+   - For GitHub Pages: Add these secrets in your GitHub repository settings:
+     - Go to Settings → Secrets and variables → Actions
+     - Add `NEXT_PUBLIC_POSTHOG_KEY` with your PostHog API key
+     - Add `NEXT_PUBLIC_POSTHOG_HOST` with your PostHog host URL (optional, defaults to US)
+
+4. **PostHog features:**
+   - Automatic event capture
+   - Page view tracking
+   - User session recording (if enabled)
+   - Custom event tracking
+   - Funnel analysis
+
+Note: Both analytics tools only load if their respective environment variables are set, so it's safe to deploy without them. You can use one or both analytics solutions.
 
 ## 🏗️ Technical Architecture
 
