@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Calculator, AlertCircle, CheckCircle, Info, Target, Settings, ToggleLeft, ToggleRight, BookOpen } from 'lucide-react'
+import { ArrowLeft, Calculator, AlertCircle, CheckCircle, Info, Target, Settings, ToggleLeft, ToggleRight, BookOpen, BarChart3} from 'lucide-react'
 import { DFiberDiagram, DParticleDiagram } from '@/components/Diagrams'
 import { ContactAngleDiagram } from '@/components/ContactAngleDiagram'
 import { FiberPorosityDiagram } from '@/components/FiberPorosityDiagram'
@@ -286,13 +286,14 @@ export default function DesignerPage() {
             <div className="card">
               <h2 className="text-xl font-semibold mb-4 flex items-center">
                 <Settings className="h-5 w-5 mr-2" />
-                Design Parameters
+                Input Parameters
               </h2>
               
               {/* Liquid Selection */}
+              <h3 className="text-lg font-semibold mb-4">Design Targets</h3>
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Target Liquid
+                  Target Liquid to Repel
                 </label>
                 <select
                   value={selectedLiquid}
@@ -314,7 +315,7 @@ export default function DesignerPage() {
               {/* Target A* Selection */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Target Stability (A*)
+                  How stable do you want the coating to be?
                 </label>
                 <select
                   value={targetAStar}
@@ -326,7 +327,7 @@ export default function DesignerPage() {
                   <option value={10}>Very Stable (A* = 10)</option>
                 </select>
                 <p className="text-xs text-gray-500 mt-1">
-                  Very stable repellent finish A*=10, normal stability = 5, barely stable = 1
+                  Measurered by stability (A*) - Very stable repellent finish A*=10, normal stability = 5, barely stable = 1
                 </p>
               </div>
 
@@ -520,61 +521,6 @@ export default function DesignerPage() {
                   </div>
                 )}
 
-                {/* Equation Mixing (only when no particle coating) */}
-                {!params.useHierarchical && (
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold mb-4">Equation Mixing (2D Fabric Model)</h3>
-                    
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Equation 1 vs Equation 7 Weight
-                          <span className="text-xs text-gray-500 block">
-                            Mix between 1D approximation (Equation 1) and 2D fabric model (Equation 7)
-                          </span>
-                        </label>
-                        
-                        <div className="space-y-2">
-                          <input
-                            type="range"
-                            min="0"
-                            max="1"
-                            step="0.1"
-                            value={params.equation7Weight}
-                            onChange={(e) => updateParam('equation7Weight', parseFloat(e.target.value))}
-                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                            style={{
-                              background: `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${params.equation7Weight * 100}%, #E5E7EB ${params.equation7Weight * 100}%, #E5E7EB 100%)`
-                            }}
-                          />
-                          
-                          <div className="flex justify-between text-xs text-gray-500">
-                            <span>Pure Equation 1 (1D)</span>
-                            <span>Pure Equation 7 (2D)</span>
-                          </div>
-                          
-                          <div className="text-center">
-                            <span className="text-sm font-medium text-gray-700">
-                              Current mix: {Math.round((1 - params.equation7Weight) * 100)}% Equation 1, {Math.round(params.equation7Weight * 100)}% Equation 7
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <div className="mt-3 p-3 bg-blue-50 rounded border-l-4 border-blue-500">
-                          <p className="text-sm text-blue-800">
-                            <strong>Equation 7:</strong> Two-dimensional definition of fabric porosity that accounts for 
-                            the actual weave structure. This is more accurate for plain weave fabrics where 
-                            yarns intersect and create a true 2D geometry.
-                          </p>
-                          <p className="text-xs text-blue-600 mt-1">
-                            Use more Equation 7 for plain weaves, more Equation 1 for simple fiber arrays.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 {/* Show calculated values */}
                 {fabricInputMode !== 'preset' && (
                   <div className="mt-4 p-3 bg-blue-50 rounded border-l-4 border-blue-500">
@@ -604,12 +550,67 @@ export default function DesignerPage() {
                     )}
                   </div>
                 )}
+
+                {/* Equation Mixing (only when no particle coating) */}
+                {!params.useHierarchical && (
+                  <div className="mb-4">
+                    <h4 className="text-medium font-semibold mb-4"> Is our fabric 1D or 2D? We can mix the two models.</h4>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Model Mixing Weight
+                          <span className="text-xs text-gray-500 block">
+                            Mix between 1D model (Equation 1) and 2D model (Equation 7)
+                          </span>
+                        </label>
+                        
+                        <div className="space-y-2">
+                          <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.1"
+                            value={params.equation7Weight}
+                            onChange={(e) => updateParam('equation7Weight', parseFloat(e.target.value))}
+                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                            style={{
+                              background: `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${params.equation7Weight * 100}%, #E5E7EB ${params.equation7Weight * 100}%, #E5E7EB 100%)`
+                            }}
+                          />
+                          
+                          <div className="flex justify-between text-xs text-gray-500">
+                            <span>Pure 1D model (Equation 1)</span>
+                            <span>Pure 2D model (Equation 7)</span>
+                          </div>
+                          
+                          <div className="text-center">
+                            <span className="text-sm font-medium text-gray-700">
+                              Current mix: {Math.round((1 - params.equation7Weight) * 100)}% 1D model (Eq. 1), {Math.round(params.equation7Weight * 100)}% 2D model (Eq. 7)
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-3 p-3 bg-blue-50 rounded border-l-4 border-blue-500">
+                          <p className="text-sm text-blue-800">
+                            <strong>1D or 2D?</strong> A 2D model is more accurate for plain weave fabrics where yarns intersect and create a true 2D geometry. The 2D model assumes every yarn of the weave is wetting. If one instead assumes half the yarns remain dry, the 2D model reduces to the 1D model. Experimentally, mixing 50% of each leads to the best fit with the data.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                
               </div>
 
               {/* Surface Chemistry */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-4">Surface Chemistry</h3>
-                
+                <h3 className="text-lg font-semibold mb-4">Chemistry of the coating applied to the fabric</h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  The chemistry of the coating applied to the fabric affects the contact angle of the liquid on the fabric.
+                  You can override the default contact angle if the material/liquid is not in the default list.
+                </p>
                 <div className="grid grid-cols-2 gap-2 mb-4">
                   {Object.entries(SURFACE_CHEMISTRIES).map(([key, chem]) => {
                     const contactAngle = getContactAngleForLiquid(selectedLiquid, key)
@@ -632,7 +633,7 @@ export default function DesignerPage() {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Young's Contact Angle (degrees)
+                    Or override presets with your own Flat Young's Contact Angle (degrees)
                     <span className="text-xs text-gray-500 block">
                       Auto-updated based on liquid selection. Normal range: 0-120°
                     </span>
@@ -647,7 +648,7 @@ export default function DesignerPage() {
                     step="1"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Contact angle between liquid and a smooth, solid surface of this chemistry. You can override manually if material/liquid is not in the default list.
+                    Contact angle between liquid and <strong>a smooth, solid surface</strong> of this chemistry. You can override manually if material/liquid is not in the default list.
                   </p>
                 </div>
               </div>
@@ -655,7 +656,7 @@ export default function DesignerPage() {
               {/* Particle Coating Toggle */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Particle Coating (Hierarchical)</h3>
+                  <h3 className="text-lg font-semibold">Does the coating have particles within it? (Hierarchical coating)</h3>
                   <button
                     onClick={() => updateParam('useHierarchical', !params.useHierarchical)}
                     className="flex items-center"
@@ -667,6 +668,7 @@ export default function DesignerPage() {
                     )}
                   </button>
                 </div>
+                <p className="text-xs text-gray-500 mt-1 mb-3">Hierarchical coating is a model that assumes the coating has particles within it. Therefore, repellency is achieved by the fabric texture, the coating chemistry, and the particles.</p>
                 
                 {params.useHierarchical && (
                   <div className="space-y-4">
@@ -739,7 +741,7 @@ export default function DesignerPage() {
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           θ*<sub>particle</sub> (degrees)
-                          <span className="text-xs text-gray-500 block">Contact angle measured on smooth substrate with particle coating</span>
+                          <span className="text-xs text-gray-500 block">Contact angle measured <strong>on a smooth substrate with only the particles in the coating </strong> (no fabric texture).</span>
                         </label>
                         <input
                           type="number"
@@ -757,7 +759,7 @@ export default function DesignerPage() {
                     {results && results.maxDFiberStar && (
                       <div className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
                         <p className="text-sm text-blue-700">
-                          <strong>Maximum D*<sub>fiber</sub> for A* = {targetAStar}:</strong> {results.maxDFiberStar.toFixed(2)}
+                          <strong>Maximum D*<sub>fiber</sub> possible to achieve target stability (A* = {targetAStar}):</strong> {results.maxDFiberStar.toFixed(2)}
                         </p>
                         <p className="text-xs text-blue-600 mt-1">
                           This is the maximum fiber porosity that maintains the target stability for your particle coating.
@@ -791,7 +793,10 @@ export default function DesignerPage() {
               <>
                 {/* Key Results */}
                 <div className="card">
-                  <h2 className="text-xl font-semibold mb-4">Key Results</h2>
+                  <h2 className="text-xl font-semibold mb-4 flex items-center">
+                    <BarChart3 className="h-5 w-5 mr-2" />
+                    Key Results
+                  </h2>
                   
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <div className="space-y-4">
@@ -806,6 +811,13 @@ export default function DesignerPage() {
                           <DFiberDiagram />
                         </div>
                       </div>
+                      
+                      {/* Plus sign when hierarchical is enabled */}
+                      {params.useHierarchical && (
+                        <div className="flex justify-center items-center py-2">
+                          <div className="text-3xl font-bold text-gray-600">+</div>
+                        </div>
+                      )}
                       
                       {/* Particle Porosity - appears below Fiber Porosity when hierarchical is enabled */}
                       {params.useHierarchical && (
@@ -923,75 +935,73 @@ export default function DesignerPage() {
                       </div>
                     </div>
                   </div>
-                </div>
 
-
-                {/* Smart Recommendations */}
-                <div className="card">
-                  <h3 className="text-lg font-semibold mb-4">Smart Recommendations</h3>
-                  
-                  <div className="space-y-3">
-                    {(() => {
-                      const contactAngle = params.useHierarchical && results.thetaHierarchical 
-                        ? results.thetaHierarchical 
-                        : results.thetaConvolved
-                      
-                      if (contactAngle < 90) {
-                        return (
-                          <div className="flex items-start p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                            <Info className="h-5 w-5 text-yellow-600 mr-2 mt-0.5" />
-                            <div className="text-sm">
-                              <strong>Low Contact Angle:</strong> Consider using a different surface chemistry 
-                              (try PDMS or fluorinated) or increasing fabric porosity.
+                  {/* Smart Recommendations */}
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <h3 className="text-lg font-semibold mb-4">Smart Recommendations</h3>
+                    
+                    <div className="space-y-3">
+                      {(() => {
+                        const contactAngle = params.useHierarchical && results.thetaHierarchical 
+                          ? results.thetaHierarchical 
+                          : results.thetaConvolved
+                        
+                        if (contactAngle < 90) {
+                          return (
+                            <div className="flex items-start p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                              <Info className="h-5 w-5 text-yellow-600 mr-2 mt-0.5" />
+                              <div className="text-sm">
+                                <strong>Low Contact Angle:</strong> Consider using a different surface chemistry 
+                                (try PDMS or fluorinated) or increasing fabric porosity.
+                              </div>
                             </div>
-                          </div>
-                        )
-                      }
-                      
-                      if (contactAngle >= 90 && contactAngle < 140) {
-                        return (
-                          <div className="flex items-start p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <Info className="h-5 w-5 text-blue-600 mr-2 mt-0.5" />
-                            <div className="text-sm">
-                              <strong>Good Oleophobicity:</strong> Consider adding hierarchical particle texture 
-                              to achieve superoleophobic behavior (θ* &gt; 140°).
+                          )
+                        }
+                        
+                        if (contactAngle >= 90 && contactAngle < 140) {
+                          return (
+                            <div className="flex items-start p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                              <Info className="h-5 w-5 text-blue-600 mr-2 mt-0.5" />
+                              <div className="text-sm">
+                                <strong>Good Oleophobicity:</strong> Consider adding hierarchical particle texture 
+                                to achieve superoleophobic behavior (θ* &gt; 140°).
+                              </div>
                             </div>
-                          </div>
-                        )
-                      }
-                      
-                      if (results.desiredParticleSpacing && results.desiredParticleSpacing < 0.1) {
-                        return (
-                          <div className="flex items-start p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                            <Info className="h-5 w-5 text-orange-600 mr-2 mt-0.5" />
-                            <div className="text-sm">
-                              <strong>Precise Control Required:</strong> Very small particle spacing needed. 
-                              Consider using smaller particles or different coating method.
+                          )
+                        }
+                        
+                        if (results.desiredParticleSpacing && results.desiredParticleSpacing < 0.1) {
+                          return (
+                            <div className="flex items-start p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                              <Info className="h-5 w-5 text-orange-600 mr-2 mt-0.5" />
+                              <div className="text-sm">
+                                <strong>Precise Control Required:</strong> Very small particle spacing needed. 
+                                Consider using smaller particles or different coating method.
+                              </div>
                             </div>
-                          </div>
-                        )
-                      }
-                      
-                      if (results.isStable && contactAngle >= 140) {
-                        return (
-                          <div className="flex items-start p-3 bg-green-50 border border-green-200 rounded-lg">
-                            <Info className="h-5 w-5 text-green-600 mr-2 mt-0.5" />
-                            <div className="text-sm">
-                              <strong>Excellent Design:</strong> You have achieved superoleophobic behavior 
-                              with good stability. This design should work well in practice.
+                          )
+                        }
+                        
+                        if (results.isStable && contactAngle >= 140) {
+                          return (
+                            <div className="flex items-start p-3 bg-green-50 border border-green-200 rounded-lg">
+                              <Info className="h-5 w-5 text-green-600 mr-2 mt-0.5" />
+                              <div className="text-sm">
+                                <strong>Excellent Design:</strong> You have achieved superoleophobic behavior 
+                                with good stability. This design should work well in practice.
+                              </div>
                             </div>
-                          </div>
-                        )
-                      }
-                      
-                      return null
-                    })()}
-                  </div>
-                </div>
+                          )
+                        }
+                        
+                        return null
+                      })()}
+                    </div>
+                    </div>
 
                 {/* Diagram Card */}
                 {!params.useHierarchical && results && (
-                  <div className="card">
+                  <div className="card mt-4">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-lg font-semibold">Contact angle and Robustness Plot</h3>
                       <DiagramInfoPopup 
@@ -1015,6 +1025,10 @@ export default function DesignerPage() {
                     </div>
                   </div>
                 )}
+                </div>
+
+
+                
 
                 {/* Equations Used Footer */}
                 <div className="card bg-gray-50">
