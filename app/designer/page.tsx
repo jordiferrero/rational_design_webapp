@@ -7,6 +7,8 @@ import { DFiberDiagram, DParticleDiagram } from '@/components/Diagrams'
 import { ContactAngleDiagram } from '@/components/ContactAngleDiagram'
 import { FiberPorosityDiagram } from '@/components/FiberPorosityDiagram'
 import { AStarPopup } from '@/components/AStarPopup'
+import { DiagramInfoPopup } from '@/components/DiagramInfoPopup'
+import { DesignerPlot } from '@/components/DesignerPlot'
 import { 
   YoungsEquationPopup, 
   FiberContactAnglePopup, 
@@ -46,7 +48,7 @@ export default function DesignerPage() {
     dParticleStarOverride: null,
     youngsAngle: 35, // degrees (PDMS)
     desiredContactAngle: 140, // degrees
-    stabilityValue: 5, // A* value
+    stabilityValue: 1, // A* value (default to 1)
     useHierarchical: false, // whether to use particle coating
     usePerformanceTargets: false, // whether to use performance targets
     equation7Weight: 0.5, // Default to 50/50 mix of Equation 1 and 7
@@ -55,7 +57,7 @@ export default function DesignerPage() {
   const [selectedLiquid, setSelectedLiquid] = useState('hexadecane')
   const [selectedSurfaceChemistry, setSelectedSurfaceChemistry] = useState('pdms')
   const [selectedFabricPreset, setSelectedFabricPreset] = useState<string | null>('plainWeave')
-  const [targetAStar, setTargetAStar] = useState(5) // Default A* value
+  const [targetAStar, setTargetAStar] = useState(1) // Default A* value (set to 1)
   const [particleInputMode, setParticleInputMode] = useState<'size' | 'angle'>('angle') // 'size' for diameter/spacing, 'angle' for theta*_particle
   const [fabricInputMode, setFabricInputMode] = useState<'preset' | 'size' | 'angle' | 'percentOA'>('preset') // 'preset' for dropdown, 'size' for diameter/spacing, 'angle' for theta*_fiber, 'percentOA' for %OA input
   const [calculatedDParticleStar, setCalculatedDParticleStar] = useState<number | null>(null) // D*_particle calculated from θ*_particle
@@ -790,42 +792,46 @@ export default function DesignerPage() {
                 <div className="card">
                   <h2 className="text-xl font-semibold mb-4">Key Results</h2>
                   
-                  <div className={`grid gap-4 mb-6 ${params.useHierarchical ? 'grid-cols-3' : 'grid-cols-2'}`}>
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {results.DFiberStar.toFixed(2)}
-                      </div>
-                      <div className="text-sm text-gray-600 mb-2">Fiber Porosity (D*<sub>fiber</sub>)</div>
-                      <FiberPorosityDiagram dStar={results.DFiberStar} size={180} />
-                      <div className="mt-2">
-                        <DFiberDiagram />
-                      </div>
-                    </div>
-                    
-                    {params.useHierarchical && (
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="space-y-4">
+                      {/* Fiber Porosity */}
                       <div className="text-center p-4 bg-gray-50 rounded-lg">
-                        {particleInputMode === 'size' ? (
-                          <>
-                            <div className="text-2xl font-bold text-gray-900">
-                              {results.currentDParticleStar?.toFixed(2) || 'N/A'}
-                            </div>
-                            <div className="text-sm text-gray-600 mb-2">Particle Porosity (D*<sub>particle</sub>)</div>
-                            <DParticleDiagram />
-                          </>
-                        ) : (
-                          <>
-                            <div className="text-2xl font-bold text-gray-900">
-                              {calculatedDParticleStar?.toFixed(2) || 'N/A'}
-                            </div>
-                            <div className="text-sm text-gray-600 mb-2">Particle Porosity (D*<sub>particle</sub>)</div>
-                            <div className="text-xs text-gray-500 mt-2">
-                              Calculated from θ*<sub>particle</sub> = {params.thetaParticleStar.toFixed(1)}°
-                            </div>
-                            <DParticleDiagram />
-                          </>
-                        )}
+                        <div className="text-2xl font-bold text-gray-900">
+                          {results.DFiberStar.toFixed(2)}
+                        </div>
+                        <div className="text-sm text-gray-600 mb-2">Fiber Porosity (D*<sub>fiber</sub>)</div>
+                        <FiberPorosityDiagram dStar={results.DFiberStar} size={180} />
+                        <div className="mt-2">
+                          <DFiberDiagram />
+                        </div>
                       </div>
-                    )}
+                      
+                      {/* Particle Porosity - appears below Fiber Porosity when hierarchical is enabled */}
+                      {params.useHierarchical && (
+                        <div className="text-center p-4 bg-gray-50 rounded-lg">
+                          {particleInputMode === 'size' ? (
+                            <>
+                              <div className="text-2xl font-bold text-gray-900">
+                                {results.currentDParticleStar?.toFixed(2) || 'N/A'}
+                              </div>
+                              <div className="text-sm text-gray-600 mb-2">Particle Porosity (D*<sub>particle</sub>)</div>
+                              <DParticleDiagram />
+                            </>
+                          ) : (
+                            <>
+                              <div className="text-2xl font-bold text-gray-900">
+                                {calculatedDParticleStar?.toFixed(2) || 'N/A'}
+                              </div>
+                              <div className="text-sm text-gray-600 mb-2">Particle Porosity (D*<sub>particle</sub>)</div>
+                              <div className="text-xs text-gray-500 mt-2">
+                                Calculated from θ*<sub>particle</sub> = {params.thetaParticleStar.toFixed(1)}°
+                              </div>
+                              <DParticleDiagram />
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
                     
                     <div className="text-center p-4 bg-gray-50 rounded-lg">
                       <div className="text-2xl font-bold text-gray-900">
@@ -962,6 +968,37 @@ export default function DesignerPage() {
                       return null
                     })()}
                   </div>
+                </div>
+
+                {/* Diagram Card */}
+                <div className="card">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">Contact angle and Robustness Plot</h3>
+                    <DiagramInfoPopup 
+                      liquid={selectedLiquid} 
+                      surfaceChemistry={SURFACE_CHEMISTRIES[selectedSurfaceChemistry as keyof typeof SURFACE_CHEMISTRIES]?.name || 'PDMS'} 
+                    />
+                  </div>
+                  
+                  {!params.useHierarchical && results ? (
+                    <div className="w-full max-w-full overflow-hidden">
+                      <DesignerPlot
+                        liquid={selectedLiquid}
+                        surfaceChemistry={selectedSurfaceChemistry}
+                        youngsAngle={params.youngsAngle}
+                        fiberDiameter={params.fiberDiameter}
+                        equation7Weight={params.equation7Weight}
+                        currentDFiberStar={results.DFiberStar}
+                        targetStabilityValue={params.stabilityValue}
+                        width={800}
+                        height={400}
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>Plot coming soon</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Equations Used Footer */}
