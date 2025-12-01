@@ -288,8 +288,9 @@ export default function DesignerPage() {
                 <Settings className="h-5 w-5 mr-2" />
                 Input Parameters
               </h2>
-              
-              {/* Liquid Selection */}
+              <div className="space-y-6">
+                {/* Design Targets Card */}
+                <div className="card">
               <h3 className="text-lg font-semibold mb-4">Design Targets</h3>
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -330,10 +331,11 @@ export default function DesignerPage() {
                   Measurered by stability (A*) - Very stable repellent finish A*=10, normal stability = 5, barely stable = 1
                 </p>
               </div>
+            </div>
 
-              {/* Fabric Structure */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-4">Fabric Structure</h3>
+            {/* Fabric Structure Card */}
+            <div className="card">
+              <h3 className="text-lg font-semibold mb-4">Fabric Structure</h3>
                 
                 {/* Input Mode Selection */}
                 <div className="mb-4">
@@ -602,11 +604,11 @@ export default function DesignerPage() {
                 )}
 
                 
-              </div>
+            </div>
 
-              {/* Surface Chemistry */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-4">Chemistry of the coating applied to the fabric</h3>
+            {/* Surface Chemistry Card */}
+            <div className="card">
+              <h3 className="text-lg font-semibold mb-4">Chemistry of the coating applied to the fabric</h3>
                 <p className="text-sm text-gray-600 mb-3">
                   The chemistry of the coating applied to the fabric affects the contact angle of the liquid on the fabric.
                   You can override the default contact angle if the material/liquid is not in the default list.
@@ -651,12 +653,12 @@ export default function DesignerPage() {
                     Contact angle between liquid and <strong>a smooth, solid surface</strong> of this chemistry. You can override manually if material/liquid is not in the default list.
                   </p>
                 </div>
-              </div>
+            </div>
 
-              {/* Particle Coating Toggle */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Does the coating have particles within it? (Hierarchical coating)</h3>
+            {/* Hierarchical Coating Card */}
+            <div className="card">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Does the coating have particles within it? (Hierarchical coating)</h3>
                   <button
                     onClick={() => updateParam('useHierarchical', !params.useHierarchical)}
                     className="flex items-center"
@@ -768,8 +770,8 @@ export default function DesignerPage() {
                     )}
                   </div>
                 )}
+            </div>
               </div>
-
             </div>
           </div>
 
@@ -1078,6 +1080,26 @@ export default function DesignerPage() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-gray-400 mb-4">
+              All code and content is based on the research paper "Rational design of perfluorocarbon-free oleophobic textiles" 
+              (Nature Sustainability, 2020) by Sadaf Shabanian, Behrooz Khatir, Ambreen Nisar, and Kevin Golovin.
+            </p>
+            <p className="text-sm text-gray-500 mb-2">
+              All rights reserved to Amphibio Ltd. (trading as Amphico). 2025.
+            </p>
+            <p className="text-sm text-gray-500">
+              <a href="https://www.amphico.uk" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300 underline">
+                www.amphico.uk
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

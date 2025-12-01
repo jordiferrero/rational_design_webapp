@@ -122,8 +122,13 @@ export default function HomePage() {
               All code and content is based on the research paper "Rational design of perfluorocarbon-free oleophobic textiles" 
               (Nature Sustainability, 2020) by Sadaf Shabanian, Behrooz Khatir, Ambreen Nisar, and Kevin Golovin.
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 mb-2">
               All rights reserved to Amphibio Ltd. (trading as Amphico). 2025.
+            </p>
+            <p className="text-sm text-gray-500">
+              <a href="https://www.amphico.uk" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300 underline">
+                www.amphico.uk
+              </a>
             </p>
           </div>
         </div>
