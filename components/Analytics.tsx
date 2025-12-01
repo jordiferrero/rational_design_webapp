@@ -2,7 +2,7 @@
 
 import Script from 'next/script'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 
 declare global {
   interface Window {
@@ -15,7 +15,7 @@ declare global {
   }
 }
 
-export function Analytics() {
+function AnalyticsTracker() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
@@ -31,6 +31,12 @@ export function Analytics() {
       page_path: url,
     })
   }, [pathname, searchParams, GA_MEASUREMENT_ID])
+
+  return null
+}
+
+export function Analytics() {
+  const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
 
   if (!GA_MEASUREMENT_ID) {
     return null
@@ -51,6 +57,9 @@ export function Analytics() {
           gtag('config', '${GA_MEASUREMENT_ID}');
         `}
       </Script>
+      <Suspense fallback={null}>
+        <AnalyticsTracker />
+      </Suspense>
     </>
   )
 }
